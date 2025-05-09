@@ -10,6 +10,9 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "InventoryComponent.h"
+#include "ItemBase.h"
+#include "CharacterHUD.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -52,12 +55,21 @@ AInventorySysDesignCharacter::AInventorySysDesignCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 }
 
 void AInventorySysDesignCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+
+
+	if(InventoryComponent)
+	{
+		InventoryComponent->OnInventoryUpdated.AddDynamic(this, &AInventorySysDesignCharacter::RequestQuickSlotRefresh);
+	}
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -86,6 +98,11 @@ void AInventorySysDesignCharacter::SetupPlayerInputComponent(UInputComponent* Pl
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AInventorySysDesignCharacter::Look);
+
+
+		//InventorySystem Key Bind
+		EnhancedInputComponent->BindAction(IA_ItemDrop, ETriggerEvent::Triggered, this, &AInventorySysDesignCharacter::DropItemAction);
+		EnhancedInputComponent->BindAction(IA_Inventory, ETriggerEvent::Triggered, this, &AInventorySysDesignCharacter::InventorySwitching);
 	}
 	else
 	{
@@ -126,5 +143,44 @@ void AInventorySysDesignCharacter::Look(const FInputActionValue& Value)
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+//InventorySystemDesign
+void AInventorySysDesignCharacter::NotifyActorBeginOverlap(AActor *OtherActor)
+{
+	if(AItemBase* Item = Cast<AItemBase>(OtherActor))
+	{
+		Item->OnPickedUp(this);
+	}
+}
+
+void AInventorySysDesignCharacter::DropItemAction()
+{
+	if(InventoryComponent)
+	{
+		InventoryComponent->DropItem("Stone");
+	}
+}
+
+void AInventorySysDesignCharacter::InventorySwitching()
+{
+	if(ACharacterHUD* HUD = Cast<ACharacterHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
+	{
+		TArray<FInventoryItem> AllItems;
+		InventoryComponent->GetAllItems(AllItems);
+		HUD->ToggleInventory(AllItems);
+	}
+}
+
+void AInventorySysDesignCharacter::RequestQuickSlotRefresh()
+{
+	if(ACharacterHUD* HUD = Cast<ACharacterHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
+	{
+		TArray<FInventoryItem> QuickItems;
+		InventoryComponent->GetQuickSlotItems(QuickItems);
+
+		HUD->ShowQuickSlot(QuickItems);
+		UE_LOG(LogTemp, Log, TEXT("RequestQuickSlotRefresh Called"));
 	}
 }

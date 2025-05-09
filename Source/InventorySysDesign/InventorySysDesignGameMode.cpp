@@ -2,6 +2,7 @@
 
 #include "InventorySysDesignGameMode.h"
 #include "InventorySysDesignCharacter.h"
+#include "Public/CharacterHUD.h"
 #include "UObject/ConstructorHelpers.h"
 
 AInventorySysDesignGameMode::AInventorySysDesignGameMode()
@@ -12,4 +13,5 @@ AInventorySysDesignGameMode::AInventorySysDesignGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+	HUDClass = ACharacterHUD::StaticClass();
 }
