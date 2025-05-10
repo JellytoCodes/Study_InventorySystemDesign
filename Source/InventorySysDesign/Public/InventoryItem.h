@@ -26,6 +26,9 @@ struct FInventoryItem
 	FName ItemID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString ItemDesc;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EItemType ItemType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -37,5 +40,5 @@ struct FInventoryItem
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AItemBase> ItemClass;
 
-	FInventoryItem() : ItemID(NAME_None), ItemType(EItemType::Consumable), ItemIcon(nullptr), Quantity(1), ItemClass(nullptr) { }
+	FInventoryItem() : ItemID(NAME_None), ItemDesc(TEXT("Description")), ItemType(EItemType::Consumable), ItemIcon(nullptr), Quantity(1), ItemClass(nullptr) { }
 };

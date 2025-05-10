@@ -98,9 +98,23 @@ void AInventorySysDesignCharacter::SetupPlayerInputComponent(UInputComponent* Pl
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AInventorySysDesignCharacter::Look);
 
 
-		//InventorySystem Key Bind
-		EnhancedInputComponent->BindAction(IA_ItemDrop, ETriggerEvent::Triggered, this, &AInventorySysDesignCharacter::DropItemAction);
-		EnhancedInputComponent->BindAction(IA_Inventory, ETriggerEvent::Triggered, this, &AInventorySysDesignCharacter::InventorySwitching);
+		//InventorySystem Key
+		EnhancedInputComponent->BindAction(IA_ItemDrop, ETriggerEvent::Started, this, &AInventorySysDesignCharacter::DropItemAction);
+		EnhancedInputComponent->BindAction(IA_Inventory, ETriggerEvent::Started, this, &AInventorySysDesignCharacter::InventorySwitching);
+
+		EnhancedInputComponent->BindAction(IA_ClickAction, ETriggerEvent::Started, this, &AInventorySysDesignCharacter::ClickSwitchAction);
+
+		//QuickSlot Key
+		EnhancedInputComponent->BindAction(IA_QuickSlot_00, ETriggerEvent::Started, this, &AInventorySysDesignCharacter::SelectQuickSlot_00);
+		EnhancedInputComponent->BindAction(IA_QuickSlot_01, ETriggerEvent::Started, this, &AInventorySysDesignCharacter::SelectQuickSlot_01);
+		EnhancedInputComponent->BindAction(IA_QuickSlot_02, ETriggerEvent::Started, this, &AInventorySysDesignCharacter::SelectQuickSlot_02);
+		EnhancedInputComponent->BindAction(IA_QuickSlot_03, ETriggerEvent::Started, this, &AInventorySysDesignCharacter::SelectQuickSlot_03);
+		EnhancedInputComponent->BindAction(IA_QuickSlot_04, ETriggerEvent::Started, this, &AInventorySysDesignCharacter::SelectQuickSlot_04);
+		EnhancedInputComponent->BindAction(IA_QuickSlot_05, ETriggerEvent::Started, this, &AInventorySysDesignCharacter::SelectQuickSlot_05);
+		EnhancedInputComponent->BindAction(IA_QuickSlot_06, ETriggerEvent::Started, this, &AInventorySysDesignCharacter::SelectQuickSlot_06);
+		EnhancedInputComponent->BindAction(IA_QuickSlot_07, ETriggerEvent::Started, this, &AInventorySysDesignCharacter::SelectQuickSlot_07);
+		EnhancedInputComponent->BindAction(IA_QuickSlot_08, ETriggerEvent::Started, this, &AInventorySysDesignCharacter::SelectQuickSlot_08);
+		EnhancedInputComponent->BindAction(IA_QuickSlot_09, ETriggerEvent::Started, this, &AInventorySysDesignCharacter::SelectQuickSlot_09);
 	}
 	else
 	{
@@ -148,7 +162,16 @@ void AInventorySysDesignCharacter::NotifyActorBeginOverlap(AActor *OtherActor)
 
 void AInventorySysDesignCharacter::DropItemAction()
 {
-    InventoryComponent->DropItem("Stone");
+	if(CurrentQuickSlotIndex < 0 || CurrentQuickSlotIndex > 9) return;
+
+	TArray<FInventoryItem> QuickItems;
+	InventoryComponent->GetQuickSlotItems(QuickItems);
+
+	if(QuickItems.IsValidIndex(CurrentQuickSlotIndex))
+	{
+		const FInventoryItem& SelectedItem = QuickItems[CurrentQuickSlotIndex];
+		InventoryComponent->DropItem(SelectedItem.ItemID, 1);
+	}
 }
 
 void AInventorySysDesignCharacter::InventorySwitching()
@@ -157,7 +180,36 @@ void AInventorySysDesignCharacter::InventorySwitching()
 	{
 		TArray<FInventoryItem> AllItems;
 		InventoryComponent->GetAllItems(AllItems);
+
+		//인벤토리 아이템 정렬
+		InventoryComponent->SortItems(AllItems, EInventorySortType::Quantity);
+
 		HUD->ToggleInventory(AllItems);
+	}
+}
+
+void AInventorySysDesignCharacter::ClickSwitchAction()
+{
+	//아이템 타입 결정
+	ItemTypes ItemType = ItemTypes::Weapon;
+	//
+	switch(ItemType)
+	{
+		case ItemTypes::Weapon :
+			//AttackAction();
+		break;
+
+		case ItemTypes::Potion :
+			//InteractAction();
+		break;
+
+		case ItemTypes::Building :
+			//BuildAction();
+		break;
+
+		case ItemTypes::Trap :
+			//BuildAction();
+		break;
 	}
 }
 
@@ -170,5 +222,18 @@ void AInventorySysDesignCharacter::RequestQuickSlotRefresh()
 
 		HUD->ShowQuickSlot(QuickItems);
 		UE_LOG(LogTemp, Log, TEXT("RequestQuickSlotRefresh Called"));
+	}
+}
+
+void AInventorySysDesignCharacter::SelectQuickSlot(int32 Index)
+{
+	if( Index < 0 || Index > 9) return;
+
+	CurrentQuickSlotIndex = Index;
+	UE_LOG(LogTemp, Log, TEXT("Selected Quick Slot : %d"), Index);
+
+	if(ACharacterHUD* HUD = Cast<ACharacterHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
+	{
+		HUD->HighlightQuickSlot(Index);
 	}
 }

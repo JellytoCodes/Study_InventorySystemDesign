@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+    // Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "InventoryComponent.h"
@@ -64,22 +64,25 @@ TArray<FInventoryItem> UInventoryComponent::GetInventoryAsArray() const
     return Result;
 }
 
-void UInventoryComponent::DropItem(FName ItemID)
+void UInventoryComponent::DropItem(FName ItemID, int32 Quantity)
 {
 	if(!InventoryMap.Contains(ItemID)) return;
 
     const FInventoryItem& Item = InventoryMap[ItemID];
-    if(!Item.ItemClass) return;
-
+    if(!Item.ItemClass || Item.Quantity < Quantity) return;
+ 
     AActor* OwnerActor = GetOwner();
     if(!OwnerActor) return;
 
     FVector DropLocation = OwnerActor->GetActorLocation() + OwnerActor->GetActorForwardVector() * 100.f;
     FTransform SpawnTransform(DropLocation);
 
-    GetWorld()->SpawnActor<AItemBase>(Item.ItemClass, SpawnTransform);
+    FInventoryItem DroppedItem = Item;
+    DroppedItem.Quantity = Quantity;
 
-    RemoveItem(ItemID, 1);
+    GetWorld()->SpawnActor<AItemBase>(DroppedItem.ItemClass, SpawnTransform)->SetItemData(DroppedItem);
+
+    RemoveItem(ItemID, Quantity);
     UE_LOG(LogTemp, Log, TEXT("[Drop] Item: %s | Quantity : %d"),*Item.ItemID.ToString(), Item.Quantity);   
 
     OnInventoryUpdated.Broadcast();
@@ -103,4 +106,31 @@ void UInventoryComponent::GetQuickSlotItems(TArray<FInventoryItem> &OutQuickSlot
 void UInventoryComponent::GetAllItems(TArray<FInventoryItem> &OutItems) const
 {
     InventoryMap.GenerateValueArray(OutItems);
+}
+
+void UInventoryComponent::SortItems(TArray<FInventoryItem> &Items, EInventorySortType SortType) const
+{
+    switch(SortType)
+    {
+        case EInventorySortType::Name :
+            Items.Sort([](const FInventoryItem& A, const FInventoryItem& B)
+            {
+                return A.ItemID.LexicalLess(B.ItemID);
+            });
+        break;
+
+        case EInventorySortType::Quantity :
+            Items.Sort([](const FInventoryItem& A, const FInventoryItem& B)
+            {
+                return A.Quantity > B.Quantity;
+            });
+        break;
+
+        case EInventorySortType::ItemType :
+            Items.Sort([](const FInventoryItem& A, const FInventoryItem& B)
+            {
+                return static_cast<uint8>(A.ItemType) < static_cast<uint8>(B.ItemType);
+            });
+        break;
+    }
 }

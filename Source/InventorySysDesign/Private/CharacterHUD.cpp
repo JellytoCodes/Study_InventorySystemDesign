@@ -2,6 +2,7 @@
 #include "QuickSlotWidget.h"
 #include "InventoryWidget.h"
 #include "InventoryComponent.h"
+#include "InventoryToolTipWidget.h"
 
 ACharacterHUD::ACharacterHUD()
 {
@@ -17,12 +18,19 @@ ACharacterHUD::ACharacterHUD()
 		InventoryWidgetClass = InventoryWidgetBP.Class;
 	}
 
+	static ConstructorHelpers::FClassFinder<UInventoryToolTipWidget> ToolTipWidgetBP(TEXT("/Game/WidgetBP/WBP_InventoryToolTipWidget.WBP_InventoryToolTipWidget_C"));
+	if(ToolTipWidgetBP.Succeeded())
+	{
+		 ToolTipWidgetClass = ToolTipWidgetBP.Class;
+	}
+
 }
 
 void ACharacterHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//狞浇吩 UI 积己
 	if(QuickSlotWidgetClass)
 	{
 		QuickSlotWidgetInstance = CreateWidget<UQuickSlotWidget>(GetWorld(), QuickSlotWidgetClass);
@@ -32,6 +40,8 @@ void ACharacterHUD::BeginPlay()
 			QuickSlotWidgetInstance->AddToViewport();
 		}
 	}
+
+	//牢亥配府 UI 积己
 	if(InventoryWidgetClass)
 	{
 		InventoryWidgetInstance = CreateWidget<UInventoryWidget>(GetWorld(), InventoryWidgetClass);
@@ -59,5 +69,39 @@ void ACharacterHUD::ToggleInventory(const TArray<FInventoryItem> &Items)
 	{
 		InventoryWidgetInstance->RemoveFromParent();
 		bIsInventoryOpen = !bIsInventoryOpen;
+	}
+}
+
+void ACharacterHUD::HighlightQuickSlot(int32 Index)
+{
+	if(QuickSlotWidgetInstance)
+	{
+		QuickSlotWidgetInstance->HighlightSlot(Index);
+	}
+}
+
+void ACharacterHUD::ShowItemToolTip(const FInventoryItem &Item)
+{
+	UE_LOG(LogTemp, Log, TEXT("ShowItemToolTip"));
+	if(!ToolTipWidgetInstance && ToolTipWidgetClass)
+	{
+		ToolTipWidgetInstance = CreateWidget<UInventoryToolTipWidget>(GetWorld(), ToolTipWidgetClass);
+	}
+
+	if(ToolTipWidgetInstance)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Show %s Item ToolTip"), *Item.ItemID.ToString());
+		ToolTipWidgetInstance->AddToViewport(100);
+		ToolTipWidgetInstance->Setup(Item);
+	}
+}
+
+void ACharacterHUD::HideItemToolTip()
+{
+	UE_LOG(LogTemp, Log, TEXT("HideItemToolTip"));
+	if(ToolTipWidgetInstance)
+	{
+		ToolTipWidgetInstance->RemoveFromParent();
+		UE_LOG(LogTemp, Log, TEXT("Hide ToolTip"));
 	}
 }

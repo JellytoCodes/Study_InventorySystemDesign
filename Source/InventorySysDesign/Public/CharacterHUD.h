@@ -9,6 +9,8 @@
 
 class UQuickSlotWidget;
 class UInventoryWidget;
+class UInventoryToolTipWidget;
+struct FInventoryItem;
 
 UCLASS()
 class INVENTORYSYSDESIGN_API ACharacterHUD : public AHUD
@@ -20,21 +22,32 @@ public :
 	virtual void BeginPlay() override;
 
 	void ShowQuickSlot(const TArray<FInventoryItem>& Items);
-
+	
 	void ToggleInventory(const TArray<FInventoryItem> &Items);
+
+	void HighlightQuickSlot(int32 Index);
+
+	void ShowItemToolTip(const FInventoryItem& Item);
+	void HideItemToolTip();
 
 private :
 	UPROPERTY()
 	UQuickSlotWidget* QuickSlotWidgetInstance;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "QuickSlot")
 	TSubclassOf<UQuickSlotWidget> QuickSlotWidgetClass;
 
 	UPROPERTY()
 	UInventoryWidget* InventoryWidgetInstance;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Inventory")
 	TSubclassOf<UInventoryWidget> InventoryWidgetClass;
+
+	UPROPERTY()
+	UInventoryToolTipWidget* ToolTipWidgetInstance;
+
+	UPROPERTY(EditDefaultsOnly, Category = "ToolTip")
+	TSubclassOf<UInventoryToolTipWidget> ToolTipWidgetClass;
 
 	bool bIsInventoryOpen = false;
 };

@@ -5,11 +5,12 @@
 #include "Components/UniformGridPanel.h"
 #include "Components/UniformGridSlot.h"
 #include "InventorySlotWidget.h"
-
+#include "CharacterHUD.h"
 
 void UInventoryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+
 }
 
 void UInventoryWidget::RefreshInventory(const TArray<FInventoryItem> &Items)
@@ -23,7 +24,7 @@ void UInventoryWidget::RefreshInventory(const TArray<FInventoryItem> &Items)
 		UInventorySlotWidget* SlotWidget = CreateWidget<UInventorySlotWidget>(this, SlotWidgetClass);
 		if(SlotWidget)
 		{
-			SlotWidget->SetItemData(Items[i].ItemIcon, Items[i].Quantity);
+			SlotWidget->SetItemData(Items[i]);
 
 			UUniformGridSlot* GridSlot = InventoryGrid->AddChildToUniformGrid(SlotWidget);
 			if(GridSlot)
@@ -32,6 +33,5 @@ void UInventoryWidget::RefreshInventory(const TArray<FInventoryItem> &Items)
 				GridSlot->SetRow(i / NumColumns);
 			}
 		}
-
 	}
 }

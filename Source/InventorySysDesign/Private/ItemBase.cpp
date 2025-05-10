@@ -34,3 +34,8 @@ void AItemBase::OnPickedUp(AActor *Picker)
 		Destroy();
 	}
 }
+
+void AItemBase::SetItemData(const FInventoryItem &NewItemData)
+{
+	ItemData = NewItemData;
+}

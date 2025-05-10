@@ -20,6 +20,8 @@ public:
 
 	void OnPickedUp(class AActor* Picker);
 
+	void SetItemData(const FInventoryItem& NewItemData);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

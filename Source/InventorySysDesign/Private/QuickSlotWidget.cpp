@@ -5,12 +5,24 @@
 #include "QuickSlotSlotWidget.h"
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
+#include "InventoryComponent.h"
+
+UQuickSlotWidget::UQuickSlotWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	static ConstructorHelpers::FObjectFinder<UTexture2D> DefaultIconTexture(TEXT("/Game/Blueprints/DefaultIcon.DefaultIcon"));
+	if(DefaultIconTexture.Succeeded())
+	{
+		DefaultIcon = DefaultIconTexture.Object;
+	}
+}
 
 void UQuickSlotWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
 	CreateInitialSlots();
+	
+
 }
 
 void UQuickSlotWidget::CreateInitialSlots()
@@ -44,25 +56,38 @@ void UQuickSlotWidget::CreateInitialSlots()
 
 void UQuickSlotWidget::RefreshQuickSlots(const TArray<FInventoryItem> &QuickSlotItems)
 {
-	if(!QuickSlotBox) return;
+    if (!QuickSlotBox) return;
 
-	int32 Index = 0;
-	for(UWidget* Child : QuickSlotBox->GetAllChildren())
+	UE_LOG(LogTemp, Log, TEXT("Called RefreshQuickSlots"));
+    const TArray<UWidget*>& Slots = QuickSlotBox->GetAllChildren();
+
+    for(int32 i = 0; i < Slots.Num(); i++)
+    {
+        if(UQuickSlotSlotWidget* SlotWidget = Cast<UQuickSlotSlotWidget>(Slots[i]))
+        {
+            if(QuickSlotItems.IsValidIndex(i) && QuickSlotItems[i].Quantity > 0)
+            {
+				UE_LOG(LogTemp, Log, TEXT("SlotItemID : %s , SlotItemQuantity : %d"), *QuickSlotItems[i].ItemID.ToString(), QuickSlotItems[i].Quantity);
+                SlotWidget->SetItemData(QuickSlotItems[i].ItemIcon, QuickSlotItems[i].Quantity);
+            }
+            else
+            {
+				UE_LOG(LogTemp, Log, TEXT("Disable Item"));
+                SlotWidget->SetItemData(DefaultIcon, 0);
+            }
+        }
+    }
+}
+
+void UQuickSlotWidget::HighlightSlot(int32 Index)
+{
+	const TArray<UWidget*>& Slots = QuickSlotBox->GetAllChildren();
+
+	for(int32 i = 0 ; i < Slots.Num() ; i++)
 	{
-		if(UQuickSlotSlotWidget* SlotWidget = Cast<UQuickSlotSlotWidget>(Child))
+		if(UQuickSlotSlotWidget* SlotWidget = Cast<UQuickSlotSlotWidget>(Slots[i]))
 		{
-			UE_LOG(LogTemp, Log, TEXT("Cast<UQuickSlotSlotWidget>(Child)"));
-			if(QuickSlotItems.IsValidIndex(Index))
-			{
-				UE_LOG(LogTemp, Log, TEXT("QuickSLotItems.IsValidIndex"));
-				const FInventoryItem& Item = QuickSlotItems[Index];
-				SlotWidget->SetItemData(Item.ItemIcon, Item.Quantity);
-			}
-			else
-			{
-				SlotWidget->SetItemData(nullptr, 0);
-			}
+			SlotWidget->SetHighlight(i == Index);
 		}
-		Index++;
 	}
 }
