@@ -76,4 +76,6 @@ public :
 
 	//æ∆¿Ã≈€ »πµÊ √≥∏Æ
 	void NotifyActorBeginOverlap(AActor* OtherActor);
+	void NotifyTouchItem(AActor* OtherActor);
+	
 };

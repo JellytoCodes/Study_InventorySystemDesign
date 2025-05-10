@@ -2,6 +2,7 @@
 
 
 #include "InventoryComponent.h"
+#include "Net/UnrealNetwork.h"
 #include "ItemBase.h"
 
 // Sets default values for this component's properties
@@ -79,8 +80,8 @@ void UInventoryComponent::DropItem(FName ItemID)
     GetWorld()->SpawnActor<AItemBase>(Item.ItemClass, SpawnTransform);
 
     RemoveItem(ItemID, 1);
-    UE_LOG(LogTemp, Log, TEXT("[Drop] Item: %s | Quantity : %d"),*Item.ItemID.ToString(), Item.Quantity);
-    
+    UE_LOG(LogTemp, Log, TEXT("[Drop] Item: %s | Quantity : %d"),*Item.ItemID.ToString(), Item.Quantity);   
+
     OnInventoryUpdated.Broadcast();
 }
 

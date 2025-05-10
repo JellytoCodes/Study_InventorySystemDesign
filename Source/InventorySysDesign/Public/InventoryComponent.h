@@ -17,9 +17,11 @@ public:
 	// Sets default values for this component's properties
 	UInventoryComponent();
 
+    TMap<FName, FInventoryItem> InventoryMap;
+
     UPROPERTY(BlueprintAssignable, Category = "Inventory")
     FOnInventoryUpdated OnInventoryUpdated;
-
+    
 	/** 아이템 추가 */
     UFUNCTION(BlueprintCallable)
     bool AddItem(const FInventoryItem& NewItem);
@@ -43,8 +45,5 @@ public:
     void GetQuickSlotItems(TArray<FInventoryItem>& OutQuickSlotItems) const;
 
     void GetAllItems(TArray<FInventoryItem>& OutItems) const;
-protected:
-    UPROPERTY(VisibleAnywhere)
-    TMap<FName, FInventoryItem> InventoryMap;
-
+    
 };
