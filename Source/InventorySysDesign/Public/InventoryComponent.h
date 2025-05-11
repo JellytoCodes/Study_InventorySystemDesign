@@ -15,6 +15,7 @@ enum class EInventorySortType : uint8
     Name,
     Quantity,
     ItemType,
+    Price,
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -40,7 +41,7 @@ public:
     bool RemoveItem(FName ItemID, int32 Count = 1);
     
     //아이템 드랍 처리
-	void DropItem(FName ItemID, int32 Quantity = 1);
+	void DropItem(const FInventoryItem& Item);
 
     // 해당 아이템 수량 반환 
     UFUNCTION(BlueprintCallable)

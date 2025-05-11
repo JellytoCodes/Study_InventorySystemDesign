@@ -82,7 +82,7 @@ void ACharacterHUD::HighlightQuickSlot(int32 Index)
 
 void ACharacterHUD::ShowItemToolTip(const FInventoryItem &Item)
 {
-	UE_LOG(LogTemp, Log, TEXT("ShowItemToolTip"));
+	UE_LOG(LogTemp, Log, TEXT("ShowFInventoryItemItemToolTip"));
 	if(!ToolTipWidgetInstance && ToolTipWidgetClass)
 	{
 		ToolTipWidgetInstance = CreateWidget<UInventoryToolTipWidget>(GetWorld(), ToolTipWidgetClass);
@@ -91,6 +91,21 @@ void ACharacterHUD::ShowItemToolTip(const FInventoryItem &Item)
 	if(ToolTipWidgetInstance)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Show %s Item ToolTip"), *Item.ItemID.ToString());
+		ToolTipWidgetInstance->AddToViewport(100);
+		ToolTipWidgetInstance->Setup(Item);
+	}
+}
+
+void ACharacterHUD::ShowItemToolTip(const FItemDataRow* Item)
+{
+	UE_LOG(LogTemp, Log, TEXT("ShowFItemDataRowToolTip"));
+	if(!ToolTipWidgetInstance && ToolTipWidgetClass && Item)
+	{
+		ToolTipWidgetInstance = CreateWidget<UInventoryToolTipWidget>(GetWorld(), ToolTipWidgetClass);
+	}
+
+	if(ToolTipWidgetInstance)
+	{
 		ToolTipWidgetInstance->AddToViewport(100);
 		ToolTipWidgetInstance->Setup(Item);
 	}

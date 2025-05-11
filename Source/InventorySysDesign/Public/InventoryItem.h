@@ -7,16 +7,6 @@
 
 class AItemBase;
 
-UENUM(BlueprintType)
-enum class EItemType : uint8
-{
-	Consumable	UMETA(DisplayName = "Consumable"),
-	Equipment	UMETA(DisplayName = "Equipment"),
-	Material	UMETA(DisplayName = "Material"),
-	QuestItem	UMETA(DisplayName = "QuestItem"),
-	Placeable	UMETA(DisplayName = "Placeable"),
-};
-
 USTRUCT(BlueprintType)
 struct FInventoryItem
 {
@@ -26,19 +16,5 @@ struct FInventoryItem
 	FName ItemID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString ItemDesc;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EItemType ItemType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UTexture2D* ItemIcon;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Quantity;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AItemBase> ItemClass;
-
-	FInventoryItem() : ItemID(NAME_None), ItemDesc(TEXT("Description")), ItemType(EItemType::Consumable), ItemIcon(nullptr), Quantity(1), ItemClass(nullptr) { }
 };

@@ -21,12 +21,23 @@ public :
 protected :
 	virtual void NativeConstruct() override;
 
-	UPROPERTY(meta = (BindWIdget))
+	UPROPERTY(meta = (BindWidget))
 	UUniformGridPanel* InventoryGrid;
+
+	UPROPERTY(meta = (BindWidget))
+	class UComboBoxString* SortComboBox;
 
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	TSubclassOf<UInventorySlotWidget> SlotWidgetClass;
 
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	int32 NumColumns = 5;
+
+	UFUNCTION()
+	void OnSortOptionChanged(FString SelectedItem, ESelectInfo::Type SelectionType);
+
+	TArray<FInventoryItem> CachedItems;
+
+	UPROPERTY()
+	class UInventoryComponent* InventoryComponent;
 };

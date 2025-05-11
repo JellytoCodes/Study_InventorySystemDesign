@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "InventoryItem.h"
 #include "QuickSlotSlotWidget.generated.h"
 
 class UImage;
@@ -17,7 +18,7 @@ class INVENTORYSYSDESIGN_API UQuickSlotSlotWidget : public UUserWidget
 
 public :	
 	//Slot에 Icon과 수량 정보 입력
-	void SetItemData(UTexture2D* Icon, int32 Count);
+	void SetItemData(const FInventoryItem& Item);
 
 	UFUNCTION(BlueprintCallable)
 	void SetHighlight(bool bSelected);

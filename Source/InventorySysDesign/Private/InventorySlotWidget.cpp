@@ -4,6 +4,7 @@
 #include "InventorySlotWidget.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Kismet/GameplayStatics.h"
 #include "CharacterHUD.h"
 
 void UInventorySlotWidget::NativeConstruct()
@@ -30,14 +31,18 @@ void UInventorySlotWidget::NativeOnMouseLeave(const FPointerEvent &InMouseEvent)
 
 void UInventorySlotWidget::SetItemData(const FInventoryItem& InItem)
 {
-	ItemData = InItem;
-	if(ItemImage && InItem.ItemIcon)	ItemImage->SetBrushFromTexture(InItem.ItemIcon);
+	UItemDBSubsystem* ItemDB = GetGameInstance()->GetSubsystem<UItemDBSubsystem>();
+	if(!ItemDB) return;
+
+	ItemData = ItemDB->GetItemData(InItem.ItemID);
+
+	if(ItemImage && ItemData->ItemIcon)	ItemImage->SetBrushFromTexture(ItemData->ItemIcon);
 	else if(ItemImage)					ItemImage->SetBrushFromTexture(nullptr);
 
 	if(QuantityText)
 	{
 		QuantityText->SetText(FText::AsNumber(InItem.Quantity));
-		QuantityText->SetVisibility(InItem.Quantity >= 1 ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+		QuantityText->SetVisibility(InItem.Quantity > 0 ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
 	}
 }
 

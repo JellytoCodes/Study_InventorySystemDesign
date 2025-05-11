@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "InventoryItem.h"
+#include "ItemDBSubsystem.h"
 #include "InventorySlotWidget.generated.h"
 
 class UImage;
@@ -37,6 +38,5 @@ protected :
 
 	class ACharacterHUD* OwningHUD;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Item")
-	FInventoryItem ItemData;
+	const FItemDataRow* ItemData;
 };

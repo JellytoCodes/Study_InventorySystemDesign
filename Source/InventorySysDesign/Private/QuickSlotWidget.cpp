@@ -54,7 +54,7 @@ void UQuickSlotWidget::CreateInitialSlots()
 	}
 }
 
-void UQuickSlotWidget::RefreshQuickSlots(const TArray<FInventoryItem> &QuickSlotItems)
+void UQuickSlotWidget::RefreshQuickSlots(const TArray<FInventoryItem>& QuickSlotItems)
 {
     if (!QuickSlotBox) return;
 
@@ -67,13 +67,15 @@ void UQuickSlotWidget::RefreshQuickSlots(const TArray<FInventoryItem> &QuickSlot
         {
             if(QuickSlotItems.IsValidIndex(i) && QuickSlotItems[i].Quantity > 0)
             {
-				UE_LOG(LogTemp, Log, TEXT("SlotItemID : %s , SlotItemQuantity : %d"), *QuickSlotItems[i].ItemID.ToString(), QuickSlotItems[i].Quantity);
-                SlotWidget->SetItemData(QuickSlotItems[i].ItemIcon, QuickSlotItems[i].Quantity);
+                SlotWidget->SetItemData(QuickSlotItems[i]);
             }
             else
             {
-				UE_LOG(LogTemp, Log, TEXT("Disable Item"));
-                SlotWidget->SetItemData(DefaultIcon, 0);
+				FInventoryItem DummyItem;
+				DummyItem.ItemID = NAME_None;
+				DummyItem.Quantity = 0;
+
+                SlotWidget->SetItemData(DummyItem);
             }
         }
     }

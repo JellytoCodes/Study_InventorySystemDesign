@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
 #include "InventoryItem.h"
+#include "ItemDBSubsystem.h"
 #include "CharacterHUD.generated.h"
 
 class UQuickSlotWidget;
@@ -28,6 +29,7 @@ public :
 	void HighlightQuickSlot(int32 Index);
 
 	void ShowItemToolTip(const FInventoryItem& Item);
+	void ShowItemToolTip(const FItemDataRow* Item);
 	void HideItemToolTip();
 
 private :

@@ -4,22 +4,18 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "ItemDBSubsystem.h"
+#include "InventoryItem.h"
 #include "InventorySysDesignCharacter.generated.h"
 
-UENUM(BlueprintType)
-enum class ItemTypes : uint8
-{
-	Weapon,
-	Potion,
-	Building,
-	Trap,
-};
+DECLARE_DELEGATE(FItemActionDelegate)
 
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
+struct FInventoryItem;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -131,6 +127,14 @@ protected :
 	UFUNCTION()	void SelectQuickSlot_09() { SelectQuickSlot(9); }
 	//
 
+	TMap<EItemTypes, FItemActionDelegate> ItemTypeActionMap;
+
+	void AttackAction();
+	void UsePotion();
+	void BuildStructure();
+	void DeployTrap();
+
+	FInventoryItem EquippedItem;
 
 public :
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")

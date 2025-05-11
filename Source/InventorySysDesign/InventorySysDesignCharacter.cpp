@@ -54,6 +54,11 @@ void AInventorySysDesignCharacter::BeginPlay()
 	{
 		InventoryComponent->OnInventoryUpdated.AddDynamic(this, &AInventorySysDesignCharacter::RequestQuickSlotRefresh);
 	}
+
+	ItemTypeActionMap.Add(EItemTypes::Weapon, FItemActionDelegate::CreateUObject(this, &AInventorySysDesignCharacter::AttackAction));
+	ItemTypeActionMap.Add(EItemTypes::Potion, FItemActionDelegate::CreateUObject(this, &AInventorySysDesignCharacter::UsePotion));
+	ItemTypeActionMap.Add(EItemTypes::Building, FItemActionDelegate::CreateUObject(this, &AInventorySysDesignCharacter::BuildStructure));
+	ItemTypeActionMap.Add(EItemTypes::Trap, FItemActionDelegate::CreateUObject(this, &AInventorySysDesignCharacter::DeployTrap));
 }
 
 void AInventorySysDesignCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -147,7 +152,7 @@ void AInventorySysDesignCharacter::DropItemAction()
 	if(QuickItems.IsValidIndex(CurrentQuickSlotIndex))
 	{
 		const FInventoryItem& SelectedItem = QuickItems[CurrentQuickSlotIndex];
-		InventoryComponent->DropItem(SelectedItem.ItemID, 1);
+		InventoryComponent->DropItem(SelectedItem);
 	}
 }
 
@@ -158,35 +163,32 @@ void AInventorySysDesignCharacter::InventorySwitching()
 		TArray<FInventoryItem> AllItems;
 		InventoryComponent->GetAllItems(AllItems);
 
-		//인벤토리 아이템 정렬
-		InventoryComponent->SortItems(AllItems, EInventorySortType::Quantity);
-
 		HUD->ToggleInventory(AllItems);
 	}
 }
 
 void AInventorySysDesignCharacter::ClickSwitchAction()
 {
-	//아이템 타입 결정
-	ItemTypes ItemType = ItemTypes::Weapon;
-	//
-	switch(ItemType)
+	UE_LOG(LogTemp, Log, TEXT("ClickSwitchAction Called"));
+
+	FName CurrentItemID = EquippedItem.ItemID;
+	if(CurrentItemID == NAME_None) return;
+	UE_LOG(LogTemp, Log, TEXT("CurrentItemID"));
+
+	UItemDBSubsystem* ItemDB = GetGameInstance()->GetSubsystem<UItemDBSubsystem>();
+	if(!ItemDB) return;
+	UE_LOG(LogTemp, Log, TEXT("ItemDB"));
+
+	const FItemDataRow* ItemData = ItemDB->GetItemData(CurrentItemID);
+	if(!ItemData) return;
+	UE_LOG(LogTemp, Log, TEXT("ItemData"));
+
+	EItemTypes ItemType = ItemData->ItemType;
+
+	UE_LOG(LogTemp, Log, TEXT("Clicked Action Item : %d"), ItemType);
+	if(FItemActionDelegate* Action = ItemTypeActionMap.Find(ItemType))
 	{
-		case ItemTypes::Weapon :
-			//AttackAction();
-		break;
-
-		case ItemTypes::Potion :
-			//InteractAction();
-		break;
-
-		case ItemTypes::Building :
-			//BuildAction();
-		break;
-
-		case ItemTypes::Trap :
-			//BuildAction();
-		break;
+		Action->ExecuteIfBound();
 	}
 }
 
@@ -209,8 +211,36 @@ void AInventorySysDesignCharacter::SelectQuickSlot(int32 Index)
 	CurrentQuickSlotIndex = Index;
 	UE_LOG(LogTemp, Log, TEXT("Selected Quick Slot : %d"), Index);
 
+	TArray<FInventoryItem> QuickItems;
+	InventoryComponent->GetQuickSlotItems(QuickItems);
+
+	if (QuickItems.IsValidIndex(Index))
+	{
+		EquippedItem = QuickItems[Index];
+	}
+
 	if(ACharacterHUD* HUD = Cast<ACharacterHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
 	{
 		HUD->HighlightQuickSlot(Index);
 	}
+}
+
+void AInventorySysDesignCharacter::AttackAction()
+{
+	UE_LOG(LogTemp, Log, TEXT("Weapon Used: Attack!"));
+}
+
+void AInventorySysDesignCharacter::UsePotion()
+{
+	UE_LOG(LogTemp, Log, TEXT("Potion Used! HP Restored."));
+}
+
+void AInventorySysDesignCharacter::BuildStructure()
+{
+	UE_LOG(LogTemp, Log, TEXT("Building Placed."));
+}
+
+void AInventorySysDesignCharacter::DeployTrap()
+{
+	UE_LOG(LogTemp, Log, TEXT("Trap Deployed."));
 }

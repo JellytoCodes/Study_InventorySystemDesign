@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "InventoryItem.h"
+#include "ItemDBSubsystem.h"
 #include "InventoryToolTipWidget.generated.h"
 
 class UTextBlock;
@@ -18,6 +19,7 @@ class INVENTORYSYSDESIGN_API UInventoryToolTipWidget : public UUserWidget
 public :
 	UFUNCTION(BlueprintCallable)
 	void Setup(const FInventoryItem& Item);
+	void Setup(const FItemDataRow* Item);
 
 protected :
 	virtual void NativeConstruct() override;

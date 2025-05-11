@@ -5,6 +5,7 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Components/Border.h"
+#include "ItemDBSubsystem.h"
 
 void UQuickSlotSlotWidget::NativeConstruct()
 {
@@ -12,12 +13,29 @@ void UQuickSlotSlotWidget::NativeConstruct()
 
 }
 
-void UQuickSlotSlotWidget::SetItemData(UTexture2D *Icon, int32 Count)
+void UQuickSlotSlotWidget::SetItemData(const FInventoryItem& Item)
 {
-	UE_LOG(LogTemp, Log, TEXT("[UI] SetItemData called. Icon: %s | Count: %d"),Icon ? *Icon->GetName() : TEXT("None"), Count);
+    if (Item.ItemID == NAME_None || Item.Quantity <= 0)
+    {
+        // 비어 있는 슬롯 처리
+        ItemImage->SetBrushFromTexture(nullptr);
+        QuantityText->SetText(FText::GetEmpty());
+        return;
+    }
 
-	if(ItemImage && Icon)	ItemImage->SetBrushFromTexture(Icon);
-	if(QuantityText)		QuantityText->SetText(FText::AsNumber(Count));
+    UItemDBSubsystem* ItemDB = GetGameInstance()->GetSubsystem<UItemDBSubsystem>();
+    if (!ItemDB) return;
+
+    const FItemDataRow* ItemData = ItemDB->GetItemData(Item.ItemID);
+    if (!ItemData) return;
+
+    if (ItemData->ItemIcon)
+    {
+        ItemImage->SetBrushFromTexture(ItemData->ItemIcon);
+    }
+
+    QuantityText->SetText(FText::AsNumber(Item.Quantity));
+    QuantityText->SetVisibility(Item.Quantity > 0 ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
 }
 
 void UQuickSlotSlotWidget::SetHighlight(bool bSelected)
