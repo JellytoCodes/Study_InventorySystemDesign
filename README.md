@@ -59,23 +59,23 @@
 
 ## ⚙️ 핵심 구현 사항 (완료 항목)
 - [X] **인벤토리 전반 흐름 구현**  
- → 아이템 획득 시 AItemBase::OnPickedUp() → InventoryComponent::AddItem() 호출  
- → DropItem()을 통해 아이템 월드에 드롭 및 RemoveItem() 호출  
+&nbsp;&nbsp;→ 아이템 획득 시 AItemBase::OnPickedUp() → InventoryComponent::AddItem() 호출  
+&nbsp;&nbsp;→ DropItem()을 통해 아이템 월드에 드롭 및 RemoveItem() 호출  
 
 - [X] **UI 동기화 처리**  
- → 아이템 아이콘 및 수량을 FItemDataRow 기반으로 출력  
- → 수량이 1개일 경우 텍스트 생략 처리  
- → 퀵슬롯은 실시간 업데이트 및 현재 선택 슬롯 강조 처리  
+&nbsp;&nbsp;→ 아이템 아이콘 및 수량을 FItemDataRow 기반으로 출력  
+&nbsp;&nbsp;→ 수량이 1개일 경우 텍스트 생략 처리  
+&nbsp;&nbsp;→ 퀵슬롯은 실시간 업데이트 및 현재 선택 슬롯 강조 처리  
 
 - [X] **정렬 시스템 구성**  
- → 콤보박스를 통해 유저가 원하는 정렬 방식 선택 가능  
- → InventoryComponent::SortItems() 호출로 리스트 재정렬  
- → 정렬 기준: 이름, 수량, 아이템 타입, 가격  
+&nbsp;&nbsp;→ 콤보박스를 통해 유저가 원하는 정렬 방식 선택 가능  
+&nbsp;&nbsp;→ InventoryComponent::SortItems() 호출로 리스트 재정렬  
+&nbsp;&nbsp;→ 정렬 기준: 이름, 수량, 아이템 타입, 가격  
 
 - [X] **Delegate 기반 행동 처리**  
- → EItemType → 행동 함수로의 Delegate 매핑  
- → 캐릭터는 장착 아이템의 ItemType을 기준으로 적절한 Delegate 호출  
- → 행동 분기 로직이 캐릭터 내부에 직접 고정되지 않고 유연하게 확장 가능  
+&nbsp;&nbsp;→ EItemType → 행동 함수로의 Delegate 매핑  
+&nbsp;&nbsp;→ 캐릭터는 장착 아이템의 ItemType을 기준으로 적절한 Delegate 호출  
+&nbsp;&nbsp;→ 행동 분기 로직이 캐릭터 내부에 직접 고정되지 않고 유연하게 확장 가능  
 
 
 ## 🧑‍💻 Author
