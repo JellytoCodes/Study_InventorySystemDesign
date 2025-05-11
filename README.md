@@ -1,63 +1,83 @@
 # Study_InventorySystemDesign
 
-**Unreal Engine 5.4.4 기반의 인벤토리 + 퀵슬롯 시스템 설계 실습 프로젝트**
+**Unreal Engine 5.4.4 기반의 학습용 실험 프로젝트**  
 
-## 🎯 학습 목표
+**"이 기능을 이러한 구조로 만든 이유"라는 의미에 초점을 두고 설계하고자 학습하는 것이 목표인 프로젝트입니다.**
 
-- 구조적이고 확장 가능한 인벤토리 시스템 구현
-- UI 연동, 정렬 및 슬롯 자동 배치 등 실전 기능을 기반으로 설계 능력 향상
-- OOP 원칙에 따라 컴포넌트 중심으로 시스템을 분리하고 관리
-- 
 
-## 🧩 시스템 구성
+## 학습 목적
 
-### 📦 핵심 구조
+> 본 프로젝트는 Unreal Engine의 구조적 설계 원칙을 기반으로 한 구현 명확성, 시스템 확장성, 책임 분리에 중점을 둔 인벤토리 시스템 개발을 목표로 하여 구조 설계 기반의 실전 대응형 인벤토리 시스템을 완성했습니다.  
 
-- `FInventoryItem`, `EItemType` 구조체 + 열거형 설계
-- `UInventoryComponent`: 아이템 저장, 슬롯 관리, 중복 처리
-- `TArray`, `TMap` 기반 정렬/탐색 시스템
 
-### 🎮 아이템 획득 및 드랍
+## 설계 원칙 적용
 
-- `AItemBase`: 픽업 대상 액터 클래스
-- `OnOverlap`, `Interact()` 방식으로 아이템 획득 처리
-- `DropItem()` 호출 시 아이템 월드 스폰 구현
+1. **SRP (단일 책임 원칙)**  
+ → AItemBase는 상호작용과 월드 오브젝트 역할에 집중하며, UInventoryComponent는 아이템의 데이터 관리 전반을 전담할 수 있도록 설계하였습니다.
 
-### 🧠 UI 출력 시스템
+2. **DIP (의존성 역전 원칙)**  
+ → UI와 시스템 로직은 서로 직접 의존하지 않고, Delegate를 통해 비동기적으로 연결되는 구조를 설계하였습니다.
+ 
+3. **LSP (리스코프 치환 원칙)**  
+ → 구조체 기반 시스템 설계에서 FInventoryItem과 FItemDataRow는 동일한 방식으로 각 위젯에 전달 및 처리되며, 이들에 대한 기능 호출은 별도의 타입 구분 없이 일관되게 작동하도록 설계하였습니다.
 
-- `UInventoryWidget`, `UQuickSlotWidget`: 인벤토리/퀵슬롯 전용 위젯 설계
-- 슬롯 위젯 아이콘, 수량 표시
-- InputAction 기반 위젯 열기/닫기 처리
-- Delegate 연동을 통한 실시간 UI 동기화
+4. **ISP (인터페이스 분리 원칙)**  
+ → UI 위젯 클래스들은 각자 필요한 동작(슬롯 출력, 정렬 선택, 하이라이트 등)에만 집중되어 있으며, 불필요한 의존 없이 명확한 목적에 따라 인터페이스를 분리해 구성되게 설계하였습니다.
 
-### 🔁 슬롯 자동 배치 및 정렬
+5. **OCP (개방-폐쇄 원칙)**  
+ → 새로운 아이템 타입을 추가하거나 행동을 확장할 때 기존 분기문을 수정하지 않고, TMap<EItemType, FItemActionDelegate> 구조에 Delegate만 등록하면 행동이 자연스럽게 확장되도록 설계하였습니다.
 
-- 비어 있는 슬롯 자동 탐색 후 아이템 배치
-- 정렬 기준: 아이템 타입, 이름, 획득 순서
-- TMap 또는 커스텀 비교 함수 기반 정렬 로직 설계
+6. **Event-Driven**  
+ → DesignOnInventoryUpdated 같은 Delegate 이벤트를 통해 인벤토리 상태가 변할 때마다 여러 위젯 시스템이 자동으로 갱신되도록 구성하였습니다.
 
----
+7. **Data-Driven Flow**  
+ → 아이템 속성, 분류, 가격 등 모든 메타데이터는 ItemMasterTable이라는 DataTable을 통해 외부에서 정의됩니다. 
+ → 로직은 이 데이터를 기반으로 유연하게 동작합니다.새로운 아이템 타입을 추가하거나 행동을 확장할 때 기존 분기문을 수정하지 않고 행동이 자연스럽게 확장되도록 설계했습니다. 
 
-## ✅ 현재 구현된 기능
 
-- [x] 인벤토리 슬롯 시스템 완성
-- [x] 퀵슬롯 UI 및 기능 구현
-- [x] 아이템 획득 및 드랍 로직 구축
-- [x] 슬롯 정렬 및 자동 배치 시스템
-- [x] Delegate 기반 실시간 UI 연동
-- [ ] SaveGame 연동 (예정)
-- [ ] 상점 / 퀘스트 연계 (예정)
+## 시스템 아키텍처 요약
 
----
+**[Character]**  
+├──ItemType을 기반으로 각 행동(공격, 소비, 설치 등)을 Delegate로 등록 및 실행  
+└──퀵슬롯에서 선택한 아이템을 EquippedItem으로 설정하고 행동에 연동  
 
-## 🛠 기술 스택
+**[InventoryComponent]**  
+├──TMap<FName, FInventoryItem> 기반의 인벤토리 구조 관리  
+└──아이템 추가/제거/드랍 처리 및 OnInventoryUpdated를 통해 외부 통신  
 
-- Unreal Engine 5.4.4 (C++)
-- 구조체/열거형 기반 데이터 설계 (`FInventoryItem`, `EItemType`)
-- Delegate 및 컴포넌트 중심 아키텍처
-- UMG 기반 UI 연동
+**[ItemDBSubsystem]**  
+├──모든 아이템 데이터를 중앙화하여 관리  
+└──ItemID를 기반으로 아이템 속성 조회 및 로직 분리  
 
----
+**[InventoryWidget]**  
+├──인벤토리 슬롯을 UniformGridPanel로 출력  
+└──ComboBoxString을 통해 정렬 기준을 선택 가능 (이름, 수량, 타입, 가격)  
 
-## ✍ Author
+**[QuickSlotWidget]**  
+├──고정 10칸 구성  
+└──현재 선택된 슬롯을 강조 표시하며, Delegate를 통해 행동 연계 가능  
+
+## 핵심 구현 사항 (완료 항목)
+
+- [X] **인벤토리 전반 흐름 구현**  
+ → 아이템 획득 시 AItemBase::OnPickedUp() → InventoryComponent::AddItem() 호출  
+ → DropItem()을 통해 아이템 월드에 드롭 및 RemoveItem() 호출  
+
+- [X] **UI 동기화 처리**  
+ → 아이템 아이콘 및 수량을 FItemDataRow 기반으로 출력  
+ → 수량이 1개일 경우 텍스트 생략 처리  
+ → 퀵슬롯은 실시간 업데이트 및 현재 선택 슬롯 강조 처리  
+
+- [X] **정렬 시스템 구성**  
+ → 콤보박스를 통해 유저가 원하는 정렬 방식 선택 가능  
+ → InventoryComponent::SortItems() 호출로 리스트 재정렬  
+ → 정렬 기준: 이름, 수량, 아이템 타입, 가격  
+
+- [X] **Delegate 기반 행동 처리**  
+ → EItemType → 행동 함수로의 Delegate 매핑  
+ → 캐릭터는 장착 아이템의 ItemType을 기준으로 적절한 Delegate 호출  
+ → 행동 분기 로직이 캐릭터 내부에 직접 고정되지 않고 유연하게 확장 가능  
+
+## Author
   **JellytoCodes / 2025.05**
+
