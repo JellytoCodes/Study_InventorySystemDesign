@@ -35,7 +35,7 @@
 
 <br>
 
-## 📂 시스템 아키텍처 요약
+## 🗂️ 시스템 아키텍처 요약
 **🧱 Character**  
 &nbsp;├──ItemType을 기반으로 각 행동(공격, 소비, 설치 등)을 Delegate로 등록 및 실행  
 &nbsp;└──퀵슬롯에서 선택한 아이템을 EquippedItem으로 설정하고 행동에 연동  
